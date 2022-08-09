@@ -4,7 +4,7 @@ const FileLink = ({link}) => {
 	return (
 		<div>
 		<p>Your Link:</p>
-		<p className = 'link underline blue hover-orange'>{link}</p>
+		<a href = {link} className = 'link underline blue hover-orange'>{link}</a>
 		</div>
 	)
 }

@@ -5,7 +5,6 @@ import Logo from './components/Logo/Logo'
 import FileUploader from './components/FileUploader/FileUploader'
 import About from './components/About/About'
 import FileLink from './components/FileLink/FileLink'
-import TextLink from './components/TextLink/TextLink'
 import './App.css';
 
 
@@ -16,28 +15,41 @@ class App extends Component {
 		super();
 		this.state = {
 			route: 'upload',
-			text: false,
 			file: false,
 			link: 'test',
 		}
-		this.changeRoute=this.changeRoute.bind(this);
 	}
 
 	changeRoute = (route) => {
-		this.setState({route: route});
+		this.setState({route: route})
+	}
+
+	toggleFile = () => {
+		this.setState({file: !this.state.file})
+	}
+
+	setLink = (input) => {
+		console.log(input)
+		this.setState({link: 'http://localhost:3001/' + input}, () => {
+			this.toggleFile()
+		})
 	}
 
 	render (){
 		return(
 			<div className='App pr3 pl3'>
-			<NavBar changeRoute={this.changeRoute} route = {this.state.route}/>
+			<NavBar changeRoute={this.changeRoute}/>
 			<Logo />
 			{this.state.route === 'upload'?
-				!this.state.text?
-					this.state.file?
-					<FileLink link={this.state.link}/>:
-					<FileUploader />:
-				<TextLink link={this.state.link}/>:
+				!this.state.file?
+
+				<FileUploader
+				toggleFile = {this.toggleFile}
+				toggleText = {this.toggleText}
+				setLink = {this.setLink}
+				/>:
+
+				<FileLink link={this.state.link}/>:
 			<About />}
 			</div>
 		);
