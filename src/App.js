@@ -30,7 +30,7 @@ class App extends Component {
 
 	setLink = (input) => {
 		console.log(input)
-		this.setState({link: 'http://localhost:3001/' + input}, () => {
+		this.setState({link: 'https://files.bbtc33.com/' + input}, () => {
 			this.toggleFile()
 		})
 	}
