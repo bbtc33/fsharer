@@ -6,7 +6,7 @@ import FileUploader from './components/FileUploader/FileUploader'
 import About from './components/About/About'
 import FileLink from './components/FileLink/FileLink'
 import './App.css';
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 
 class App extends Component {
@@ -14,14 +14,9 @@ class App extends Component {
 	constructor(){
 		super();
 		this.state = {
-			route: 'upload',
 			file: false,
 			link: 'test',
 		}
-	}
-
-	changeRoute = (route) => {
-		this.setState({route: route})
 	}
 
 	toggleFile = () => {
@@ -37,21 +32,27 @@ class App extends Component {
 
 	render (){
 		return(
+			<BrowserRouter>
 			<div className='App pr3 pl3'>
-			<NavBar changeRoute={this.changeRoute}/>
+			<NavBar />
 			<Logo />
-			{this.state.route === 'upload'?
-				!this.state.file?
-
-				<FileUploader
-				toggleFile = {this.toggleFile}
-				toggleText = {this.toggleText}
-				setLink = {this.setLink}
-				/>:
-
-				<FileLink link={this.state.link}/>:
-			<About />}
+			<Routes>
+				<Route path="/" element = {
+					!this.state.file?
+					<FileUploader
+						toggleFile = {this.toggleFile}
+						setLink = {this.setLink}
+					/>:
+					<FileLink
+						link={this.state.link}
+						setLink={this.setLink}
+						toggleFile={this.toggleFile}
+					/>
+				}/>
+				<Route path="/about" element = {<About />}/>
+			</Routes>
 			</div>
+			</BrowserRouter>
 		);
 	}
 }
