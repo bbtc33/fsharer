@@ -48,8 +48,8 @@ class App extends Component {
 						setLink={this.setLink}
 						toggleFile={this.toggleFile}
 					/>
-				}/>
-				<Route path="/about" element = {<About />}/>
+				}></Route>
+				<Route path="/about" element = {<About />}></Route>
 			</Routes>
 			</div>
 			</BrowserRouter>
