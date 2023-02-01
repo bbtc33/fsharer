@@ -41,6 +41,7 @@ class FileUploader extends Component {
 
 		axios.post("/upload", this.state.formData)
 			.then((resObject) => {
+				this.props.setLink(resObject.data.link)
 			}).then(()=>{
 				this.setState({chosenFile: null})
 				this.setState({formData: new FormData()})
