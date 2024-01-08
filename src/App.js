@@ -7,6 +7,7 @@ import About from './components/About/About'
 import FileLink from './components/FileLink/FileLink'
 import './App.css';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import baseUrl from './config'
 
 
 class App extends Component {
@@ -25,7 +26,8 @@ class App extends Component {
 
 	setLink = (input) => {
 		console.log(input)
-		this.setState({link: 'https://files.bbtc33.com/' + input}, () => {
+		console.log(baseUrl)
+		this.setState({link: baseUrl + input}, () => {
 			this.toggleFile()
 		})
 	}
