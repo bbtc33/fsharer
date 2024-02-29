@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import axios from 'axios';
+import baseUrl from '../../config'
 
-axios.defaults.baseURL = 'https://files.bbtc33.com';
+axios.defaults.baseURL = baseUrl;
 axios.defaults.headers.post['Content-Type'] = 'multipart/form-data';
 axios.defaults.timeout = 60000;
 
