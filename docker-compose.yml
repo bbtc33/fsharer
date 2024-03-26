@@ -6,12 +6,13 @@ networks:
 services:
   db:
     image: postgres
+    restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: password
       POSTGRES_USER: postgres
       POSTGRES_DB: files
     volumes:
-      - ./fsharerbackend/postgres-data:/var/lib/postgresql/data
+      - ./postgres-data:/var/lib/postgresql/data #make the postgres-data directory
       - ./fsharerbackend/psql-init:/docker-entrypoint-initdb.d:ro
     networks:
       - fsharer
@@ -20,12 +21,13 @@ services:
     build:
       dockerfile: ./Dockerfile
       context: ./fsharerbackend
+    restart: unless-stopped
     volumes:
       - ./storage:/app/storage #Change to where you want your files to be stored
     networks:
       - fsharer
-    expose:
-      - "3001"
+    ports:
+      - "127.0.0.1:3001:3001"
     environment:
       PORT: 3001
       DB_HOST: db
@@ -34,58 +36,14 @@ services:
       DB_NAME: files
       STORAGE_LOC: /app/storage
       NAME_LENGTH: 4 #Length of filename, 36^NAME_LENGTH files can be stored
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.back.rule=Host(`files.bbtc33.com`)"
-        #- "traefik.http.routers.back.tls=true"
-        #- "traefik.http.routers.back.tls.certresolver=tls"
-      - "traefik.http.services.back.loadbalancer.server.port=3001"
     depends_on:
       - db
 
   frontend:
+    restart: unless-stopped
     build:
       dockerfile: ./Dockerfile
       context: ./fsharer
-    expose:
-      - "3000"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.front.rule=Host(`fsharer.bbtc33.com`)"
-        #- "traefik.http.routers.front.tls=true"
-        #- "traefik.http.routers.front.tls.certresolver=tls"
-      - "traefik.http.services.front.loadbalancer.server.port=3000"
-
-  traefik:
-    image: "traefik"
-    container_name: "traefik"
-    restart: "unless-stopped"
-    command:
-      - "--api.insecure=false"
-      - "--api.dashboard=false"
-      - "--log.level=DEBUG"
-      - "--providers.docker=true"
-      - "--global.sendAnonymousUsage=false"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-        #- "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-        #- "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-        #- "--entrypoints.websecure.address=:443"
-
-        #- "--certificatesresolvers.tls.acme.httpchallenge=true"
-        #- "--certificatesresolvers.tls.acme.httpchallenge.entrypoint=web"
-        #- "--certificatesresolvers.tls.acme.email=${EMAIL}"
-        #- "--certificatesresolvers.tls.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./letsencrypt:/letsencrypt"
-    networks:
-      - fsharer
-    # labels:
-    #   - "traefik.http.middlewares.traefik-auth.basicauth.users=${AUTH}"
-    #   - "traefik.http.routers.traefik.rule=Host(`${DOMAIN}`)"
-    #   - "traefik.http.routers.traefik.tls=true"
-    #   - "traefik.http.routers.traefik.tls.certresolver=tls"
+      - "127.0.0.1:3000:3000"
+
