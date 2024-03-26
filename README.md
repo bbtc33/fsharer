@@ -18,7 +18,7 @@ All configuration for the backend is done in the docker-compose.yml file.
 
 ## Deployment
 
-Once you have configured everything properly, run `docker compose up -d` to start fsharer
+Once you have configured everything properly, run `docker compose up -d` to start fsharer. You will need to provide your own reverse proxy (nginx, traefik, etc.)
 
 ## Acknowledgements
 
