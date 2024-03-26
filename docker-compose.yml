@@ -12,13 +12,14 @@ services:
       POSTGRES_DB: files
     volumes:
       - ./fsharerbackend/postgres-data:/var/lib/postgresql/data
-      - ./fsharerbackend/psql-init:/docker-entrypoint-initdb.d:ro
+      - ./fshaererbackend/psql-init:/docker-entrypoint-initdb.d:ro
     networks:
       - fsharer
 
   backend:
     build:
-      dockerfile: ./fsharerbackend/Dockerfile
+      dockerfile: ./Dockerfile
+      context: ./fsharerbackend
     volumes:
       - ./storage:/app/storage #Change to where you want your files to be stored
     networks:
@@ -44,7 +45,8 @@ services:
 
   frontend:
     build:
-      dockerfile: ./fsharerbackend/Dockerfile
+      dockerfile: ./Dockerfile
+      context: ./fsharer
     expose:
       - "3000"
     labels:
