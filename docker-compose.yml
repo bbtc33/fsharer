@@ -19,12 +19,12 @@ services:
   backend:
     build:
       dockerfile: ./fsharerbackend/Dockerfile
-    ports:
-      - "3001:3001"
     volumes:
       - ./storage:/app/storage #Change to where you want your files to be stored
     networks:
       - fsharer
+    expose:
+      - "3001"
     environment:
       PORT: 3001
       DB_HOST: db
@@ -33,9 +33,57 @@ services:
       DB_NAME: files
       STORAGE_LOC: /app/storage
       NAME_LENGTH: 4 #Length of filename, 36^NAME_LENGTH files can be stored
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.request.rule=Host(`back.localhost`)"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=tls"
+      - "traefik.http.services.request.loadbalancer.server.port=3001"
+    depends_on:
+      - db
 
   frontend:
     build:
       dockerfile: ./fsharerbackend/Dockerfile
+    expose:
+      - "3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.request.rule=Host(`front.localhost`)"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.routers.traefik.tls.certresolver=tls"
+      - "traefik.http.services.request.loadbalancer.server.port=3000"
+
+  traefik:
+    image: "traefik"
+    container_name: "traefik"
+    restart: "unless-stopped"
+    command:
+      - "--api.insecure=false"
+      - "--api.dashboard=false"
+      - "--log.level=DEBUG"
+      - "--providers.docker=true"
+      - "--global.sendAnonymousUsage=false"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+
+      - "--certificatesresolvers.tls.acme.httpchallenge=true"
+      - "--certificatesresolvers.tls.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.tls.acme.email=${EMAIL}"
+      - "--certificatesresolvers.tls.acme.storage=/letsencrypt/acme.json"
     ports:
-      - "3000:3000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - fsharer
+    # labels:
+    #   - "traefik.http.middlewares.traefik-auth.basicauth.users=${AUTH}"
+    #   - "traefik.http.routers.traefik.rule=Host(`${DOMAIN}`)"
+    #   - "traefik.http.routers.traefik.tls=true"
+    #   - "traefik.http.routers.traefik.tls.certresolver=tls"
