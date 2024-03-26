@@ -1,8 +1,41 @@
 version: '3.8'
 
+networks:
+  fsharer:
+
 services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: postgres
+      POSTGRES_DB: files
+    volumes:
+      - ./fsharerbackend/postgres-data:/var/lib/postgresql/data
+      - ./fsharerbackend/psql-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - fsharer
+
+  backend:
+    build:
+      dockerfile: ./fsharerbackend/Dockerfile
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./storage:/app/storage #Change to where you want your files to be stored
+    networks:
+      - fsharer
+    environment:
+      PORT: 3001
+      DB_HOST: db
+      DB_USER: postgres
+      DB_PASS: password
+      DB_NAME: files
+      STORAGE_LOC: /app/storage
+      NAME_LENGTH: 4 #Length of filename, 36^NAME_LENGTH files can be stored
+
   frontend:
     build:
-      dockerfile: Dockerfile
+      dockerfile: ./fsharerbackend/Dockerfile
     ports:
       - "3000:3000"
