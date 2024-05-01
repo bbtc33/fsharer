@@ -17,6 +17,8 @@ const postgres = knex({
 
 let response;
 
+const bannedExts = [ "html", "htm" ];
+
 const storage = multer.diskStorage({
 	destination: function (req, file, cb) {
 		cb(null, process.env.STORAGE_LOC)
@@ -25,6 +27,17 @@ const storage = multer.diskStorage({
 		day = Math.floor(Date.now() / 86400000)
 		extensionarray = file.originalname.split(".")
 		extension = extensionarray[extensionarray.length - 1]
+
+		let banned = false;
+
+		bannedExts.forEach(ext => {
+			banned = banned || extension.endsWith(ext);
+		});
+
+		//if (extension.endsWith("html") || extension.endsWith("htm")){
+		if (banned) {
+			extension = "txt"
+		}
 		do {
 			random_int = Math.floor(Math.random() * Math.pow(36, process.env.NAME_LENGTH))
 			b36_int = random_int.toString(36)
